@@ -74,26 +74,21 @@ int main()
     std::size_t idOut = 0;
     std::vector<unsigned char> dataOut;
 
-    // Test length of 1
     unsigned char tinyPacket = 0xAB;
     bool r1 = testPQ.receive(1, &tinyPacket, 1);
     assert(r1 == true);
 
-    // Test length of exactly blockSize
     std::vector<unsigned char> exactPacket(16, 0x55);
     bool r2 = testPQ.receive(2, exactPacket.data(), 16);
     assert(r2 == true);
 
-    // Test packet that is too large (length > blockSize)
     std::vector<unsigned char> oversizedPacket(16 + 1, 0xFF);
     bool r3 = testPQ.receive(3, oversizedPacket.data(), oversizedPacket.size());
     assert(r3 == false);
 
-    // Test null pointer/zero length rejection
     assert(testPQ.receive(4, nullptr, 5) == false);
     assert(testPQ.receive(5, exactPacket.data(), 0) == false);
 
-    // Drain and verify round trip
     testPQ.processNext(idOut, dataOut);
     assert(idOut == 1 && dataOut.size() == 1 && dataOut[0] == 0xAB);
 
